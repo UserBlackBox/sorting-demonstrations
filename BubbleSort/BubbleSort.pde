@@ -7,8 +7,9 @@ int i=0; //loop variables
 int j=0;
 int unsorted = items.length; //unsorted array size
 int temp = 0; //temporary variable for swapping operation
-int min = 0; //smallest unsorted index
+boolean swapped = false; //did the algo swap on this iteration
 long startFrame = 0; //algorithm starting frame number
+boolean swapping = false;
 PFont font_14, font_18; //font assets
 
 void settings(){ //processing settings
@@ -16,7 +17,7 @@ void settings(){ //processing settings
 }
 
 void setup(){ //setup program
-    surface.setTitle("Selection Sort Demonstration");
+    surface.setTitle("Bubble Sort Demonstration");
     background(255, 255, 255);
     frameRate(60); //actions per second
     for(int n=0;n<count;n++) items[n] = (int) random(1,50);
@@ -33,62 +34,67 @@ void setup(){ //setup program
 
 void draw(){ //loop
     if(started==true){ //if algorithm started
-        clear(); //clear screen
         if(i<count){
-            if(j<unsorted){
-                if(items[j]<items[min]) min=j;
-                comparisons++;
-                accesses++;
-                drawFrame();
-                for(int n=0;n<i;n++){ //highlight sorted half
-                    fill(#61bb78);
-                    strokeWeight(0);
-                    rect(205+n*(600/count),360,(600/count),-items[n]*6);
-                }
-                fill(#ffa500); //highlight pointer
-                rect(205+j*(600/count),360,(600/count),-items[j]*6);
-                fill(#b51405); //highlight min
-                rect(205+min*(600/count),360,(600/count),-items[min]*6);
-                fill(255);
-                textFont(font_14);
-                textSize(14);
-                text("Scanning for integer\nsmaller than "+items[min]+" at index "+min,5,200); //action message
-                j++;
-            }
-            else if(j==unsorted){ //if unsorted half scan complete
-                drawFrame();
-                if(min!=i){ //swap if not already in place
-                    temp = items[min];
-                    items[min] = items[i];
-                    items[i] = temp;
+            if(j<count-i-1){
+                if(swapping==false && items[j]>items[j+1]){
+                    swapping = true;
+                    drawFrame();
+                    fill(#ffa500); //highlight pointer
+                    rect(205+j*(600/count),360,(600/count),-items[j]*6);    
+                    rect(205+(j+1)*(600/count),360,(600/count),-items[j+1]*6);
                     accesses+=2;
-                    fill(255);
+                    comparisons+=1;
                     textFont(font_14);
                     textSize(14);
-                    text("Swapping indicies "+i+" and\n"+min,5,200);
+                    fill(255);
+                    text("Item at index "+j+" is\nlarger than index "+(j+1),5,200);
+                }
+                else if(swapping==true){
+                    temp = items[j];
+                    items[j] = items[j+1];
+                    items[j+1] = temp;
+                    drawFrame();
+                    fill(#ffa500); //highlight pointer
+                    rect(205+j*(600/count),360,(600/count),-items[j]*6);    
+                    rect(205+(j+1)*(600/count),360,(600/count),-items[j+1]*6);
+                    j++;
+                    accesses+=2;
+                    swapped=true;
+                    swapping=false;
+                    textFont(font_14);
+                    textSize(14);
+                    fill(255);
+                    text("Swpping indexes "+j+"\nand "+(j+1),5,200);
                 }
                 else{
+                    j++;
+                    drawFrame();
+                    fill(#ffa500); //highlight pointer
+                    rect(205+j*(600/count),360,(600/count),-items[j]*6);    
+                    rect(205+(j+1)*(600/count),360,(600/count),-items[j+1]*6);  
+                    comparisons+=1;
                     textFont(font_14);
                     textSize(14);
                     fill(255);
-                    text("Adding index "+i+" to sorted half",5,200);  
+                    text("Item at index "+j+" is\nnot larger than index "+(j+1),5,200);
                 }
-                for(int n=0;n<i;n++){ //highlight sorted half
-                    fill(#61bb78);
-                    strokeWeight(0);
-                    rect(205+n*(600/count),360,(600/count),-items[n]*6);
+            }
+            else{
+                if(swapped==false){
+                    i=count;
                 }
+                j=0;
                 i++;
-                j=i+1;
-                min=i;
+                swapped = false;
             }
         }
-        else if(i==count){
+        else{
             drawFrame();
-            for(int n=0;n<i;n++){ //highlight sorted half
+            for(int i=0;i<count;i++){
                 fill(#61bb78);
                 strokeWeight(0);
-                rect(205+n*(600/count),360,(600/count),-items[n]*6);
+                rect(205+i*(600/count),360,(600/count),-items[i]*6);
+                
             }
             textFont(font_14);
             textSize(14);
@@ -127,7 +133,7 @@ void drawFrame(){
     fill(255);
     textFont(font_18);
     textSize(18);
-    text("Selection Sort", 5, 20);
+    text("Bubble Sort", 5, 20);
     stroke(255);
     strokeWeight(1);
     line(5,28,175,28);
@@ -135,8 +141,10 @@ void drawFrame(){
     textFont(font_14);
     textSize(14);
     text("n: " + count,5,46);
-    text("Max - O(n^2): " + (int)pow(count,2),5,64);
-    text("Array Accesses: " + accesses,5,82);
-    text("Comparrisons: " + comparisons,5,100);
+    text("Worst - O(n^2): " + (int)pow(count,2),5,64);
+    text("Average - O(n^2): " + (int)pow(count,2),5,82);
+    text("Best - O(n): " + count,5,100);
+    text("Array Accesses: " + accesses,5,118);
+    text("Comparrisons: " + comparisons,5,136);
     strokeWeight(0);
 }
